@@ -1,0 +1,27 @@
+name: Build Technovate Launcher
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['launcher/**', '.github/workflows/build-windows.yml']
+permissions:
+  contents: read
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r launcher/requirements.txt
+      - name: Build EXE
+        run: pyinstaller --noconfirm --clean --windowed --onefile --name Technovate-Launcher launcher/main.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Technovate-Launcher-Windows
+          path: dist/Technovate-Launcher.exe
+          if-no-files-found: error
